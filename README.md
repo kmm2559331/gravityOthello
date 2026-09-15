@@ -1,1 +1,1 @@
-# gravityOsero
+# gravityOthello
