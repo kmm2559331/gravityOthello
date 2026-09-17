@@ -1,24 +1,46 @@
 using System.Drawing;
 using UnityEngine;
 
+//enum StoneState
+//{
+//    no,
+//    yes
+//}
+//
+//enum StoneColor
+//{
+//    black,
+//    white
+//}
+//
+//public class Stone
+//{
+//    bool live = stone;
+//
+//    bool color;
+//}
+
 public class FieldGenerator : MonoBehaviour
 {
-    const int stoneMax = 8;
+    const int stoneMax = 8;//配列の上限
 
     bool?[,] stone = new bool?[stoneMax, stoneMax];//false:黒 true:白 null:ブロックなし
-    bool?[,] change = new bool?[stoneMax, stoneMax];
 
-    Vector2 Linepos;
+    //bool?[,] change = new bool?[stoneMax, stoneMax];
+    //Stone[,] stones = new bool?[stoneMax, stoneMax];
+    //bool[,] stone = new bool[stoneMax, stoneMax];//false:黒 true:白
 
-    [SerializeField] GameObject LineParent;
-    [SerializeField] GameObject LinePrefab;
+    Vector2 Linepos;//横線の座標（石の上）
+
+    [SerializeField] GameObject LineParent;//横線の親オブジェクト
+    [SerializeField] GameObject LinePrefab;//横線のプレハブ
     private void Start()
     {
         //stone[0,stoneMax-1] = false;
         //stone[stoneMax-1,stoneMax-1] = true;
 
-        FallStone(0, false);
-        FallStone(stoneMax-1, true);
+        FallStone(0, false);//左下に黒石を置く
+        FallStone(stoneMax-1, true);//右下に白石を置く
     }
 
     public void FallStone(int x, bool color)//石を落としたら（マウスクリック）
@@ -60,7 +82,7 @@ public class FieldGenerator : MonoBehaviour
         { 
             if (stone[x, y] != color)
             {
-                change[x,y] = stone[x, y];
+                //change[x,y] = stone[x, y];
                 return false;
             }
             //間をひっくり返す
