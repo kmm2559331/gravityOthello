@@ -1004,6 +1004,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FieldGenerator
   LineParent: {fileID: 483981655}
   LinePrefab: {fileID: 7153240908759849480, guid: 923efc27428fc064db23c413f7392629, type: 3}
+  StoneBlackPrefab: {fileID: 5240574707926334238, guid: 915211671c2c331489f817d9e175c08c, type: 3}
+  StoneWihtePrefab: {fileID: 800988478724546402, guid: 763b096c75b02644f8bfd3b0ffe33864, type: 3}
 --- !u!1 &1138046812
 GameObject:
   m_ObjectHideFlags: 0

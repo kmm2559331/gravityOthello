@@ -30,19 +30,30 @@ public class FieldGenerator : MonoBehaviour
     //Stone[,] stones = new bool?[stoneMax, stoneMax];
     //bool[,] stone = new bool[stoneMax, stoneMax];//false:黒 true:白
 
+    int waitStone;//上部に待機中の石
+
     Vector2 Linepos;//横線の座標（石の上）
+    Vector2 Stonepos;
 
     [SerializeField] GameObject LineParent;//横線の親オブジェクト
     [SerializeField] GameObject LinePrefab;//横線のプレハブ
+    [SerializeField] GameObject StoneBlackPrefab;//石のプレハブ
+    [SerializeField] GameObject StoneWihtePrefab;//石のプレハブ
     private void Start()
     {
         //stone[0,stoneMax-1] = false;
         //stone[stoneMax-1,stoneMax-1] = true;
 
+
         FallStone(0, false);//左下に黒石を置く
         FallStone(stoneMax-1, true);//右下に白石を置く
     }
 
+
+    public void Update()
+    {
+        
+    }
     public void FallStone(int x, bool color)//石を落としたら（マウスクリック）
     {
         for (int i = stoneMax-1; i >= 0; i--)
@@ -50,6 +61,14 @@ public class FieldGenerator : MonoBehaviour
             if (stone[x, i] == null)
             {
                 stone[x, i] = color;
+                Stonepos = new Vector2((float)(x + 0.5), -(float)(i+0.5));//0.5を足す
+                if (color)
+                {
+                    Instantiate(StoneWihtePrefab, Stonepos, Quaternion.identity);//石を置く
+                } else 
+                {
+                    Instantiate(StoneBlackPrefab, Stonepos, Quaternion.identity);//石を置く
+                }
 
                 if (i != 0)
                 {
@@ -64,6 +83,14 @@ public class FieldGenerator : MonoBehaviour
             }
         }
     }
+
+    public void GenerateStone(bool color)
+    {
+        waitStone = 0;//黒なら左(0)
+
+        FallStone(waitStone, color);//クリックしたら
+    }
+
     public void TurnOver(int x, int y , bool color)//効率化と隣のブロックチェック、for文の中にひっくり返す処理を書く
     {
         for (int i = x-1;i >= 0; i--) { if (StoneCheck(i, y, color)) { break; } } //左
