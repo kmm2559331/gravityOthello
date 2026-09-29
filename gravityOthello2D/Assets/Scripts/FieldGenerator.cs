@@ -1,5 +1,6 @@
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 //enum StoneState
 //{
@@ -35,24 +36,39 @@ public class FieldGenerator : MonoBehaviour
     Vector2 Linepos;//横線の座標（石の上）
     Vector2 Stonepos;
 
+    private InputAction moveAction;
+
     [SerializeField] GameObject LineParent;//横線の親オブジェクト
     [SerializeField] GameObject LinePrefab;//横線のプレハブ
-    [SerializeField] GameObject StoneBlackPrefab;//石のプレハブ
-    [SerializeField] GameObject StoneWihtePrefab;//石のプレハブ
+    [SerializeField] GameObject StoneBlackPrefab;//黒石のプレハブ
+    [SerializeField] GameObject StoneWihtePrefab;//白石のプレハブ
+    [SerializeField] GameObject Arrow;//矢印
     private void Start()
     {
         //stone[0,stoneMax-1] = false;
         //stone[stoneMax-1,stoneMax-1] = true;
+        Vector3 BlackarrowPos;
+        BlackarrowPos.x = 0.5f;
+        BlackarrowPos.y = 1;
+        BlackarrowPos.z = 5;
 
+        Vector3 WihtearrowPos;
+        WihtearrowPos.x = 7.5f;
+        WihtearrowPos.y = 1;
+        WihtearrowPos.z = 5;
+
+        ArrowTransform(BlackarrowPos);
+
+        moveAction = InputSystem.actions["move"];
 
         FallStone(0, false);//左下に黒石を置く
         FallStone(stoneMax-1, true);//右下に白石を置く
     }
 
 
-    public void Update()
+    public void FixedUpdate()
     {
-        
+        //if(moveAction. = ) //InputSystemで
     }
     public void FallStone(int x, bool color)//石を落としたら（マウスクリック）
     {
@@ -116,5 +132,11 @@ public class FieldGenerator : MonoBehaviour
 
         }
         return true;
+    }
+
+    public void ArrowTransform(Vector3 pos)
+    {
+        GameObject a = Arrow;
+        a.transform.position = pos;
     }
 }
