@@ -1336,7 +1336,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 940be93d5dc741f478682d5ce8254362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FieldGenerator
-  _turn: 0
   LineParent: {fileID: 483981655}
   LinePrefab: {fileID: 7153240908759849480, guid: 923efc27428fc064db23c413f7392629, type: 3}
   StoneBlackPrefab: {fileID: 5240574707926334238, guid: 915211671c2c331489f817d9e175c08c, type: 3}
@@ -1934,9 +1933,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   mouseInput: {fileID: 1629585827492321227, guid: 42455beeee0c2b14e89bdcc07fba6e28, type: 3}
-  mouseButtonInput: {fileID: -32190130956871356, guid: 42455beeee0c2b14e89bdcc07fba6e28, type: 3}
-  _mouse: {fileID: 1482055684}
-  GameObject: {fileID: 1133323999}
 --- !u!212 &1482055686
 SpriteRenderer:
   serializedVersion: 2
@@ -1984,7 +1980,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2006,8 +2002,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
