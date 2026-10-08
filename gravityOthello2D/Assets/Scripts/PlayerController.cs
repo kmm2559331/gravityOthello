@@ -1,4 +1,5 @@
 using System;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,9 +10,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private GameObject _mouse;
     private Vector3 mousePos;
-
-    private int Black = 255;
-    private int White = 0;
+    private Renderer _mouseRend;
 
     private float cameraDistance = 10;
 
@@ -20,9 +19,11 @@ public class PlayerController : MonoBehaviour
 
     public void Start()
     {
-        //_mouse = this.GetComponent<GameObject>();
+        _mouseRend = _mouse.GetComponent<Renderer>();
         //FieldGenerator = new FieldGenerator();
         FieldGenerator = GameObject.GetComponent<FieldGenerator>();
+
+        PlayerColor(FieldGenerator._turn);
     }
 
     public void OnEnable()
@@ -51,7 +52,7 @@ public class PlayerController : MonoBehaviour
 
         FieldGenerator.FallStone(pos, state);
 
-        //_mouse = this.GameObject.GetComponent<Renderer>.material.color;
+        PlayerColor(FieldGenerator._turn);
     }
 
     public void FixedUpdate()
@@ -60,4 +61,17 @@ public class PlayerController : MonoBehaviour
         Vector3 vector3 = new Vector3(value.x, value.y, cameraDistance);
         transform.position = Camera.main.ScreenToWorldPoint(vector3);
     }
+
+    public void PlayerColor(StoneState state)
+    {
+        if (state == StoneState.Black)
+        {
+            _mouseRend.material.color = Color.black;
+        }
+        else
+        {
+            _mouseRend.material.color = Color.white;
+        }
+    }
+
 }
