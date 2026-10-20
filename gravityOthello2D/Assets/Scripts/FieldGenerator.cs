@@ -1,7 +1,9 @@
 using System.Drawing;
+using TMPro;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using static UnityEditor.PlayerSettings;
 
 public enum StoneState
@@ -19,7 +21,8 @@ public enum ChangeState
 
 public class FieldGenerator : MonoBehaviour
 {
-    const int stoneMax = 8;//配列の上限
+    const int stoneMax = 8;//配列の上限（縦横）
+    const int BoardMax = stoneMax * stoneMax;//ボードの上限
 
     //bool?[,] stone = new bool?[stoneMax, stoneMax];//false:黒 true:白 null:ブロックなし
     public StoneState[,] stone = new StoneState[stoneMax, stoneMax];
@@ -49,9 +52,18 @@ public class FieldGenerator : MonoBehaviour
 
     private ChangeColor ChangeColor;
 
+    private int endCount = 0;
+    private int BlackCount = 0;
+    private int WhiteCount = 0;
+
+    [SerializeField] private GameObject BlackUI;            //ターン表示UI
+    [SerializeField] private GameObject WhiteUI;            //ターン表示UI
+    [SerializeField] private TextMeshProUGUI BlackCountText;//TextUI
+    [SerializeField] private TextMeshProUGUI WhiteCountText;//TextUI
+
     private void Start()
     {
-        for(int x = 0; x < stoneMax;x++)
+        for (int x = 0; x < stoneMax;x++)
         {
             for(int y = 0; y < stoneMax; y++)
             {
@@ -59,7 +71,7 @@ public class FieldGenerator : MonoBehaviour
             }
         }
 
-        ResetChangeState();
+        //ResetChangeState();
 
         //ChangeColor = StonePrefab.GetComponent<ChangeColor>();
 
@@ -75,18 +87,23 @@ public class FieldGenerator : MonoBehaviour
         WihtearrowPos.y = 1;
         WihtearrowPos.z = 5;
 
-        ArrowTransform(BlackarrowPos);
+        //ArrowTransform(BlackarrowPos);
 
         moveAction = InputSystem.actions["move"];
 
         FallStone(0, _turn);//左下に黒石を置く
         FallStone(stoneMax-1, _turn);//右下に白石を置く
+
+        UISet();
     }
 
 
     public void FixedUpdate()
     {
         //if(moveAction. = ) //InputSystemで
+
+        BlackCountText.text = BlackCount.ToString();
+        WhiteCountText.text = WhiteCount.ToString();
     }
     public void FallStone(int x, StoneState turn)//石を落としたら（マウスクリック）
     {
@@ -125,6 +142,25 @@ public class FieldGenerator : MonoBehaviour
                 {
                     _turn = StoneState.Black;
                 }
+
+                if (BlackCount+WhiteCount == BoardMax-1)
+                {
+                    //ゲーム終了
+                    EndGame();
+                }
+
+                //if (i == 0)
+                //{
+                //    endCount++;
+                //    if (endCount == stoneMax - 1)
+                //    {
+                //        EndGame();
+                //    }
+                //}
+
+                UISet();
+
+                CountStone();
                 break;
             }
         }
@@ -160,6 +196,7 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[i, y] == _turn) //戻りながらひっくり返す
                 {
+                    if (i == x - 1) break;
                     for (int j = i; j <= x - 1; j++)
                     {
                         stone[j, y] = _turn;
@@ -180,6 +217,7 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if(stone[i, y] == _turn) //戻りながらひっくり返す
                 {
+                    if (i == x + 1) break;
                     for (int j = i; j >= x + 1; j--)
                     {
                         stone[j, y] = _turn;
@@ -200,6 +238,7 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[x, i] == _turn) //戻りながらひっくり返す
                 {
+                    if (i == y - 1) break;
                     for (int j = i; j <= y - 1; j++)
                     {
                         stone[x, j] = _turn;
@@ -220,6 +259,7 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[x, i] == _turn) //戻りながらひっくり返す
                 {
+                    if (i == y + 1) break;
                     for (int j = i; j >= y + 1; j--)
                     {
                         stone[x, j] = _turn;
@@ -240,10 +280,11 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
-                    for (Vector2Int j = i; i.x <= x - 1 && i.y <= y - 1; j.x++,i.y++)
+                    if (i.x == x - 1 && i.y == y - 1) break;
+                    for (Vector2Int v = i; v.x <= x - 1 && v.y <= y - 1; v.x++,v.y++)
                     {
-                        stone[j.x, j.y] = _turn;
-                        save[j.x, j.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
+                        stone[v.x, v.y] = _turn;
+                        save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
                     }
                     break;
                 }
@@ -260,10 +301,11 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
-                    for (Vector2Int j = i; i.x >= x + 1 && i.y <= y - 1; j.x--, i.y++)
+                    if(i.x == x + 1 && i.y == y - 1)break;
+                    for (Vector2Int v = i; v.x >= x + 1 && v.y <= y - 1; v.x--, v.y++)
                     {
-                        stone[j.x, j.y] = _turn;
-                        save[j.x, j.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
+                        stone[v.x, v.y] = _turn;
+                        save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
                     }
                     break;
                 }
@@ -280,10 +322,11 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
-                    for (Vector2Int j = i; i.x <= x - 1 && i.y >= y + 1; j.x++, i.y--)
+                    if (i.x == x - 1 && i.y == y + 1) break;
+                    for (Vector2Int v = i; v.x <= x - 1 && v.y >= y + 1; v.x++, v.y--)
                     {
-                        stone[j.x, j.y] = _turn;
-                        save[j.x, j.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
+                        stone[v.x, v.y] = _turn;
+                        save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
                     }
                     break;
                 }
@@ -300,36 +343,11 @@ public class FieldGenerator : MonoBehaviour
                 }
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
-                    for (Vector2Int j = i; i.x >= x + 1 && i.y >= y + 1; j.x--, i.y--)
+                    if (i.x == x + 1 && i.y == y + 1) break;
+                    for (Vector2Int v= i; v.x >= x + 1 && v.y >= y + 1; v.x--, v.y--)
                     {
-                        stone[j.x, j.y] = _turn;
-                        save[j.x, j.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
-                    }
-                    break;
-                }
-            }
-            else break;
-        }
-
-        ResetChangeState();
-    }
-
-    public void StoneCheck2(int x, int y,int a,int b)
-    {
-        for (int i = x + a; i >= 0; i--)
-        {
-            if (stone[i, y] != StoneState.None) //石があるなら
-            {
-                if (stone[i, y] != _turn)
-                {
-                    continue;
-                }
-                else //戻りながらひっくり返す
-                {
-                    for (int j = i; j >= x + a; j++)
-                    {
-                        stone[i, y] = _turn;
-                        save[i, y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
+                        stone[v.x, v.y] = _turn;
+                        save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
                     }
                     break;
                 }
@@ -338,50 +356,92 @@ public class FieldGenerator : MonoBehaviour
         }
     }
 
-    public Vector2Int StoneCheck(int x, int y, StoneState turn)//ブロックのチェック
+    private void CountStone()
     {
-        if (stone[x, y] != StoneState.None) //石があるなら
-        { 
-            if (stone[x, y] == turn) //同じ石があったら
-            {
-                change[x, y] = ChangeState.True;
-                Vector2Int ret = new Vector2Int(x, y);
-                return ret;
-            }
-
-            if (stone[x, y] != turn)
-            {
-                return Retry;
-            }
-
-        }
-
-        return Exit;
-    }
-
-    public void TrunStone(int x,int y)
-    {
-        stone[x, y] = _turn;
-        if (_turn == StoneState.Black)
-        {
-            //stone[x, y] //色変更
-        }
-    }
-
-    public void ResetChangeState()
-    {
+        BlackCount = 0;
+        WhiteCount = 0;
         for (int x = 0; x < stoneMax; x++)
         {
             for (int y = 0; y < stoneMax; y++)
             {
-                change[x, y] = ChangeState.False;
+                if (stone[x, y] == StoneState.Black)
+                {
+                    BlackCount++;
+                }
+                else if (stone[x, y] == StoneState.White)
+                {
+                    WhiteCount++;
+                }
             }
         }
     }
 
-    public void ArrowTransform(Vector3 pos)
+    private void EndGame()
     {
-        GameObject a = Arrow;
-        a.transform.position = pos;
+        CountStone();
+
+        StaticData.StaticBlackCount = BlackCount;
+        StaticData.StaticWhiteCount = WhiteCount;
+
+        SceneManager.LoadScene("ResultScene");
     }
+    public void UISet()
+    {
+        if (_turn == StoneState.Black)
+        {
+            BlackUI.SetActive(true);
+            WhiteUI.SetActive(false);
+        }
+        else if (_turn == StoneState.White)
+        {
+            WhiteUI.SetActive(true);
+            BlackUI.SetActive(false);
+        }
+    }
+    //public Vector2Int StoneCheck(int x, int y, StoneState turn)//ブロックのチェック
+    //{
+    //    if (stone[x, y] != StoneState.None) //石があるなら
+    //    { 
+    //        if (stone[x, y] == turn) //同じ石があったら
+    //        {
+    //            change[x, y] = ChangeState.True;
+    //            Vector2Int ret = new Vector2Int(x, y);
+    //            return ret;
+    //        }
+    //
+    //        if (stone[x, y] != turn)
+    //        {
+    //            return Retry;
+    //        }
+    //
+    //    }
+    //
+    //    return Exit;
+    //}
+
+    //public void TrunStone(int x,int y)
+    //{
+    //    stone[x, y] = _turn;
+    //    if (_turn == StoneState.Black)
+    //    {
+    //        //stone[x, y] //色変更
+    //    }
+    //}
+
+    //public void ResetChangeState()
+    //{
+    //    for (int x = 0; x < stoneMax; x++)
+    //    {
+    //        for (int y = 0; y < stoneMax; y++)
+    //        {
+    //            change[x, y] = ChangeState.False;
+    //        }
+    //    }
+    //}
+
+    //public void ArrowTransform(Vector3 pos)
+    //{
+    //    GameObject a = Arrow;
+    //    a.transform.position = pos;
+    //}
 }
