@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Drawing;
 using TMPro;
 using UnityEditorInternal;
@@ -61,6 +62,9 @@ public class FieldGenerator : MonoBehaviour
     [SerializeField] private TextMeshProUGUI BlackCountText;//TextUI
     [SerializeField] private TextMeshProUGUI WhiteCountText;//TextUI
 
+    public bool coroutine = false;
+    public bool DropCoroutine = false;
+
     private void Start()
     {
         for (int x = 0; x < stoneMax;x++)
@@ -123,13 +127,16 @@ public class FieldGenerator : MonoBehaviour
                 //}
                 //ChangeColor = Instantiate(StonePrefab, Stonepos, Quaternion.identity, StoneParent.transform).GetComponent<ChangeColor>();
                 //ChangeColor._ChangeColor(turn);
-                save[x,i] = Instantiate(StonePrefab, Stonepos, Quaternion.identity, StoneParent.transform);
-                save[x, i].GetComponent<ChangeColor>()._ChangeColor(turn);
-                if (i != 0)
-                {
-                    Linepos = new Vector2((float)(x + 0.5), -i);
-                    Instantiate(LinePrefab, Linepos, Quaternion.identity, LineParent.transform);//石の上に線を引く
-                }
+                Vector2 coruPos = Stonepos;
+                coruPos.y = 1;
+                save[x,i] = Instantiate(StonePrefab, coruPos, Quaternion.identity, StoneParent.transform);
+                StartCoroutine(DropStoneAnimation(save[x, i], Stonepos,x,i));
+                save[x, i].GetComponent<ChangeColor>().SetColor(turn);
+                //if (i != 0)
+                //{
+                //    Linepos = new Vector2((float)(x + 0.5), -i);
+                //    Instantiate(LinePrefab, Linepos, Quaternion.identity, LineParent.transform);//石の上に線を引く
+                //}
 
                 //ひっくり返す関数を呼ぶ
                 TurnOver(x, i, turn);
@@ -166,12 +173,30 @@ public class FieldGenerator : MonoBehaviour
         }
     }
 
-    public void GenerateStone(StoneState turn)
+    IEnumerator DropStoneAnimation(GameObject stone, Vector2 pos,int x, int i)
     {
-        waitStone = 0;//黒なら左(0)
+        float mas = -0.1f;
+        for (float v = stone.transform.position.y; v >= pos.y; v += mas)
+        {
+            DropCoroutine = true;
+            stone.transform.Translate(0, mas, 0);
+            yield return new WaitForSeconds(0.01f);
+        }
+        stone.transform.position = pos;
+        if (i != 0)
+        {
+            Linepos = new Vector2((float)(x + 0.5), -i);
+            Instantiate(LinePrefab, Linepos, Quaternion.identity, LineParent.transform);//石の上に線を引く
+        }
+        DropCoroutine = false;
+    } 
 
-        FallStone(waitStone, turn);//クリックしたら
-    }
+    //public void GenerateStone(StoneState turn)
+    //{
+    //    waitStone = 0;//黒なら左(0)
+    //
+    //    FallStone(waitStone, turn);//クリックしたら
+    //}
 
     public void TurnOver(int x, int y , StoneState turn)//効率化と隣のブロックチェック、for文の中にひっくり返す処理を書く
     {
@@ -197,7 +222,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[i, y] == _turn) //戻りながらひっくり返す
                 {
                     if (i == x - 1) break;
-                    for (int j = i; j <= x - 1; j++)
+                    for (int j = i+1; j <= x - 1; j++)
                     {
                         stone[j, y] = _turn;
                         save[j, y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -218,7 +243,7 @@ public class FieldGenerator : MonoBehaviour
                 else if(stone[i, y] == _turn) //戻りながらひっくり返す
                 {
                     if (i == x + 1) break;
-                    for (int j = i; j >= x + 1; j--)
+                    for (int j = i-1; j >= x + 1; j--)
                     {
                         stone[j, y] = _turn;
                         save[j, y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -239,7 +264,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[x, i] == _turn) //戻りながらひっくり返す
                 {
                     if (i == y - 1) break;
-                    for (int j = i; j <= y - 1; j++)
+                    for (int j = i+1; j <= y - 1; j++)
                     {
                         stone[x, j] = _turn;
                         save[x, j].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -260,7 +285,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[x, i] == _turn) //戻りながらひっくり返す
                 {
                     if (i == y + 1) break;
-                    for (int j = i; j >= y + 1; j--)
+                    for (int j = i-1; j >= y + 1; j--)
                     {
                         stone[x, j] = _turn;
                         save[x, j].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -281,7 +306,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
                     if (i.x == x - 1 && i.y == y - 1) break;
-                    for (Vector2Int v = i; v.x <= x - 1 && v.y <= y - 1; v.x++,v.y++)
+                    for (Vector2Int v = new(i.x+1,i.y+1); v.x <= x - 1 && v.y <= y - 1; v.x++,v.y++)
                     {
                         stone[v.x, v.y] = _turn;
                         save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -302,7 +327,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
                     if(i.x == x + 1 && i.y == y - 1)break;
-                    for (Vector2Int v = i; v.x >= x + 1 && v.y <= y - 1; v.x--, v.y++)
+                    for (Vector2Int v = new(i.x - 1, i.y + 1); v.x >= x + 1 && v.y <= y - 1; v.x--, v.y++)
                     {
                         stone[v.x, v.y] = _turn;
                         save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -323,7 +348,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
                     if (i.x == x - 1 && i.y == y + 1) break;
-                    for (Vector2Int v = i; v.x <= x - 1 && v.y >= y + 1; v.x++, v.y--)
+                    for (Vector2Int v = new(i.x + 1, i.y - 1); v.x <= x - 1 && v.y >= y + 1; v.x++, v.y--)
                     {
                         stone[v.x, v.y] = _turn;
                         save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更
@@ -344,7 +369,7 @@ public class FieldGenerator : MonoBehaviour
                 else if (stone[i.x, i.y] == _turn) //戻りながらひっくり返す
                 {
                     if (i.x == x + 1 && i.y == y + 1) break;
-                    for (Vector2Int v= i; v.x >= x + 1 && v.y >= y + 1; v.x--, v.y--)
+                    for (Vector2Int v= new(i.x - 1, i.y - 1); v.x >= x + 1 && v.y >= y + 1; v.x--, v.y--)
                     {
                         stone[v.x, v.y] = _turn;
                         save[v.x, v.y].GetComponent<ChangeColor>()._ChangeColor(_turn); // 色変更

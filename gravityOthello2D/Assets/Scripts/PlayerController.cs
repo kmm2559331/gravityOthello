@@ -42,17 +42,20 @@ public class PlayerController : MonoBehaviour
 
     public void StoneDrop(InputAction.CallbackContext ctx)
     {
-        if(ctx.phase != InputActionPhase.Performed) return;
+        if (!FieldGenerator.coroutine)
+        {
+            if (ctx.phase != InputActionPhase.Performed) return;
 
-        mousePos = _mouse.transform.position;
-        int pos = (int)MathF.Floor(mousePos.x);
-        if (pos < 0 || pos >7) return;
+            mousePos = _mouse.transform.position;
+            int pos = (int)MathF.Floor(mousePos.x);
+            if (pos < 0 || pos > 7) return;
 
-        StoneState state = FieldGenerator._turn;
+            StoneState state = FieldGenerator._turn;
 
-        FieldGenerator.FallStone(pos, state);
+            FieldGenerator.FallStone(pos, state);
 
-        PlayerColor(FieldGenerator._turn);
+            PlayerColor(FieldGenerator._turn);
+        }
     }
 
     public void FixedUpdate()

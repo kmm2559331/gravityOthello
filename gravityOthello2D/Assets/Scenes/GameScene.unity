@@ -1541,12 +1541,13 @@ MonoBehaviour:
   LineParent: {fileID: 483981655}
   LinePrefab: {fileID: 7153240908759849480, guid: 923efc27428fc064db23c413f7392629, type: 3}
   StoneParent: {fileID: 1652336016}
-  StonePrefab: {fileID: 5240574707926334238, guid: c2f2d3186efedd446bd96d540ecc81ac, type: 3}
+  StonePrefab: {fileID: 5632487193788585834, guid: 7f450dc1ba6d5c94a91b0a3970bb4713, type: 3}
   Arrow: {fileID: 1942604869}
   BlackUI: {fileID: 1023131478}
   WhiteUI: {fileID: 1585408731}
   BlackCountText: {fileID: 1365561487}
   WhiteCountText: {fileID: 1940760267}
+  coroutine: 0
 --- !u!1 &1138046812
 GameObject:
   m_ObjectHideFlags: 0

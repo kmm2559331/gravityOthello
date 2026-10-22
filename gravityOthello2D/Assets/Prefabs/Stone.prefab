@@ -125,5 +125,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae24450c8bcff2745a870880fc3a4957, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChangeColor
-  Black: {fileID: 2100000, guid: 3dc25ecc8f6f9084c9aa5f9b09ede673, type: 2}
-  White: {fileID: 2100000, guid: 970aee032c5ed47489eea6916d98fe00, type: 2}
