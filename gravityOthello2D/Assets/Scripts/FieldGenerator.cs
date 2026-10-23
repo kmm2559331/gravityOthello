@@ -115,10 +115,13 @@ public class FieldGenerator : MonoBehaviour
         WhiteCountText.text = WhiteCount.ToString();
 
         if (isEndGame)
-        {
-            if (!isFall && !coroutine)
+        { 
+            if (BlackCount + WhiteCount == BoardMax - 1)
             {
-                StartCoroutine(EndGame());
+                if (!isFall && !coroutine)
+                {
+                    StartCoroutine(EndGame());
+                }
             }
         }
     }
