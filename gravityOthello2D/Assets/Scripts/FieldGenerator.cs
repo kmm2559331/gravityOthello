@@ -14,11 +14,11 @@ public enum StoneState
     None
 }
 
-public enum ChangeState
-{
-    True,
-    False,
-}
+//public enum ChangeState
+//{
+//    True,
+//    False,
+//}
 
 public class FieldGenerator : MonoBehaviour
 {
@@ -31,15 +31,15 @@ public class FieldGenerator : MonoBehaviour
 
     public GameObject[,] save = new GameObject[stoneMax, stoneMax];
 
-    public ChangeState[,] change = new ChangeState[stoneMax, stoneMax];
+    //public ChangeState[,] change = new ChangeState[stoneMax, stoneMax];
 
-    int waitStone;//上部に待機中の石
+    //int waitStone;//上部に待機中の石
 
     Vector2 Linepos;//横線の座標（石の上）
     Vector2 Stonepos;
 
-    private Vector2Int Retry = new Vector2Int(-1, -1);
-    private Vector2Int Exit = new Vector2Int(-10, -10);
+    //private Vector2Int Retry = new Vector2Int(-1, -1);
+    //private Vector2Int Exit = new Vector2Int(-10, -10);
 
     private InputAction moveAction;
 
@@ -51,9 +51,9 @@ public class FieldGenerator : MonoBehaviour
     //[SerializeField] GameObject StoneWihtePrefab;//白石のプレハブ
     [SerializeField] GameObject Arrow;//矢印
 
-    private ChangeColor ChangeColor;
+    //private ChangeColor ChangeColor;
 
-    private int endCount = 0;
+    //private int endCount = 0;
     private int BlackCount = 0;
     private int WhiteCount = 0;
 
@@ -62,8 +62,11 @@ public class FieldGenerator : MonoBehaviour
     [SerializeField] private TextMeshProUGUI BlackCountText;//TextUI
     [SerializeField] private TextMeshProUGUI WhiteCountText;//TextUI
 
-    public bool coroutine = false;
-    public bool DropCoroutine = false;
+    public bool coroutine = false;//回転中か
+    public bool isFall = false;   //落下中か
+
+    public bool isEndGame = false;//ゲーム終了フラグ
+    [SerializeField] private GameObject EndText;
 
     private void Start()
     {
@@ -81,22 +84,24 @@ public class FieldGenerator : MonoBehaviour
 
         //stone[0,stoneMax-1] = false;
         //stone[stoneMax-1,stoneMax-1] = true;
-        Vector3 BlackarrowPos;
-        BlackarrowPos.x = 0.5f;
-        BlackarrowPos.y = 1;
-        BlackarrowPos.z = 5;
-
-        Vector3 WihtearrowPos;
-        WihtearrowPos.x = 7.5f;
-        WihtearrowPos.y = 1;
-        WihtearrowPos.z = 5;
+        //Vector3 BlackarrowPos;
+        //BlackarrowPos.x = 0.5f;
+        //BlackarrowPos.y = 1;
+        //BlackarrowPos.z = 5;
+        //
+        //Vector3 WihtearrowPos;
+        //WihtearrowPos.x = 7.5f;
+        //WihtearrowPos.y = 1;
+        //WihtearrowPos.z = 5;
 
         //ArrowTransform(BlackarrowPos);
 
-        moveAction = InputSystem.actions["move"];
+        //moveAction = InputSystem.actions["move"];
 
-        FallStone(0, _turn);//左下に黒石を置く
-        FallStone(stoneMax-1, _turn);//右下に白石を置く
+        FallStone(3, _turn);//左下に黒石を置く
+        FallStone(4, _turn);//右下に白石を置く
+        FallStone(4, _turn);//右下に白石を置く
+        FallStone(3, _turn);//右下に白石を置く
 
         UISet();
     }
@@ -108,6 +113,14 @@ public class FieldGenerator : MonoBehaviour
 
         BlackCountText.text = BlackCount.ToString();
         WhiteCountText.text = WhiteCount.ToString();
+
+        if (isEndGame)
+        {
+            if (!isFall && !coroutine)
+            {
+                StartCoroutine(EndGame());
+            }
+        }
     }
     public void FallStone(int x, StoneState turn)//石を落としたら（マウスクリック）
     {
@@ -139,7 +152,7 @@ public class FieldGenerator : MonoBehaviour
                 //}
 
                 //ひっくり返す関数を呼ぶ
-                TurnOver(x, i, turn);
+                TurnOver(x, i);
 
                 if (turn == StoneState.Black)
                 {
@@ -150,11 +163,19 @@ public class FieldGenerator : MonoBehaviour
                     _turn = StoneState.Black;
                 }
 
+                CountStone();
+                UISet();
+
                 if (BlackCount+WhiteCount == BoardMax-1)
                 {
+                    isEndGame = true;
                     //ゲーム終了
-                    EndGame();
+                    //EndGame();
                 }
+                //if (BlackCount == 0 || WhiteCount == 0)
+                //{
+                //    isEndGame = true;
+                //}
 
                 //if (i == 0)
                 //{
@@ -164,10 +185,6 @@ public class FieldGenerator : MonoBehaviour
                 //        EndGame();
                 //    }
                 //}
-
-                UISet();
-
-                CountStone();
                 break;
             }
         }
@@ -178,7 +195,8 @@ public class FieldGenerator : MonoBehaviour
         float mas = -0.1f;
         for (float v = stone.transform.position.y; v >= pos.y; v += mas)
         {
-            DropCoroutine = true;
+            coroutine = true;
+            isFall = true;
             stone.transform.Translate(0, mas, 0);
             yield return new WaitForSeconds(0.01f);
         }
@@ -188,7 +206,16 @@ public class FieldGenerator : MonoBehaviour
             Linepos = new Vector2((float)(x + 0.5), -i);
             Instantiate(LinePrefab, Linepos, Quaternion.identity, LineParent.transform);//石の上に線を引く
         }
-        DropCoroutine = false;
+        //TurnOver(x, i);
+        coroutine = false;
+        isFall = false;
+        //float time = -pos.y;
+        //Debug.Log(time);
+        //Debug.Log("WaitForSeconds開始");
+        //yield return new WaitForSeconds(time);
+        //Debug.Log("WaitForSeconds終了");
+
+        //TurnOver(x, i);
     } 
 
     //public void GenerateStone(StoneState turn)
@@ -198,7 +225,7 @@ public class FieldGenerator : MonoBehaviour
     //    FallStone(waitStone, turn);//クリックしたら
     //}
 
-    public void TurnOver(int x, int y , StoneState turn)//効率化と隣のブロックチェック、for文の中にひっくり返す処理を書く
+    public void TurnOver(int x, int y)//効率化と隣のブロックチェック、for文の中にひっくり返す処理を書く
     {
         //for (int i = x-1;i >= 0; i--)                                                       {Vector2Int p = StoneCheck(i, y, turn);     if (p != Retry&&p!=Exit) {for (int j = x-1;j >= p.x; j--)    {TrunStone(j, y); } break; } else if(p==Exit) break;} //左
         //for (int i = x+1;i <= stoneMax-1; i++)                                              {Vector2Int p = StoneCheck(i, y, turn);     if (p != Retry&&p!=Exit) {for (int j = x+1;j <= p.x; j++)    {TrunStone(j, y); } break; } else if(p==Exit) break;} //右
@@ -401,12 +428,18 @@ public class FieldGenerator : MonoBehaviour
         }
     }
 
-    private void EndGame()
+    IEnumerator EndGame()
     {
         CountStone();
 
         StaticData.StaticBlackCount = BlackCount;
         StaticData.StaticWhiteCount = WhiteCount;
+
+        EndText.SetActive(true);
+        BlackUI.SetActive(false);
+        WhiteUI.SetActive(false);
+        StoneParent.SetActive(false);
+        yield return new WaitForSeconds(5);
 
         SceneManager.LoadScene("ResultScene");
     }

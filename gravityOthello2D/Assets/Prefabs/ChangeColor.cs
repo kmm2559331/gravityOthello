@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -43,12 +44,14 @@ public class ChangeColor : MonoBehaviour
             //a.material.color = Color.black;
             //transform.Rotate(0, 180, 0);
             StartCoroutine(MyRotate());
+            
         }
         else if (_turn == StoneState.White)
         {
             //a.material.color = Color.white;
             //transform.Rotate(0, 180, 0);
             StartCoroutine(MyRotate());
+            
         }
         else 
         {
@@ -58,6 +61,11 @@ public class ChangeColor : MonoBehaviour
 
     IEnumerator MyRotate()
     {
+        while (FieldGenerator.isFall)
+        {
+            FieldGenerator.coroutine = true;
+            yield return null;
+        }
         for (int i = 0; i < 180; i += 2)
         {
             FieldGenerator.coroutine = true;
