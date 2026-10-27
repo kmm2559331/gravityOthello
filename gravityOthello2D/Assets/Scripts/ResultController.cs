@@ -20,10 +20,12 @@ public class ResultController : MonoBehaviour
         if (BlackCount > WhiteCount)       //•‚ÌŸ‚¿
         {
             Winner.text = "Winner:Black";
+            Winner.color = Color.black;
         }
         else if (BlackCount < WhiteCount)  //”’‚ÌŸ‚¿ 
         {
             Winner.text = "Winner:White";
+            Winner.color = Color.white;
         }
         else if (BlackCount == WhiteCount) //ˆø‚«•ª‚¯
         {

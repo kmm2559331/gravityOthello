@@ -1,5 +1,4 @@
 using System;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 mousePos;
     private Renderer _mouseRend;
 
-    private float cameraDistance = 10;
+    private float cameraDistance = 5;
 
     private FieldGenerator FieldGenerator;
     [SerializeField] private GameObject GameObject;
@@ -52,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
             StoneState state = FieldGenerator._turn;
 
-            FieldGenerator.FallStone(pos, state);
+            FieldGenerator.FallStone(pos, state, true);
 
             PlayerColor(FieldGenerator._turn);
         }

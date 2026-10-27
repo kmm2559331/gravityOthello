@@ -1,11 +1,8 @@
 using System.Collections;
-using System.Drawing;
 using TMPro;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using static UnityEditor.PlayerSettings;
+
 
 public enum StoneState
 {
@@ -22,6 +19,11 @@ public enum StoneState
 
 public class FieldGenerator : MonoBehaviour
 {
+
+#if UNITY_EDITOR
+    [SerializeField] private bool isDebug;
+#endif
+
     const int stoneMax = 8;//配列の上限（縦横）
     const int BoardMax = stoneMax * stoneMax;//ボードの上限
 
@@ -61,12 +63,14 @@ public class FieldGenerator : MonoBehaviour
     [SerializeField] private GameObject WhiteUI;            //ターン表示UI
     [SerializeField] private TextMeshProUGUI BlackCountText;//TextUI
     [SerializeField] private TextMeshProUGUI WhiteCountText;//TextUI
+    [SerializeField] private GameObject EndButton;//TextUI
 
     public bool coroutine = false;//回転中か
     public bool isFall = false;   //落下中か
 
     public bool isEndGame = false;//ゲーム終了フラグ
     [SerializeField] private GameObject EndText;
+
 
     private void Start()
     {
@@ -98,14 +102,35 @@ public class FieldGenerator : MonoBehaviour
 
         //moveAction = InputSystem.actions["move"];
 
-        FallStone(3, _turn);//左下に黒石を置く
-        FallStone(4, _turn);//右下に白石を置く
-        FallStone(4, _turn);//右下に白石を置く
-        FallStone(3, _turn);//右下に白石を置く
+        StartStone();
 
         UISet();
     }
 
+    private void StartStone()
+    {
+#if UNITY_EDITOR
+        if (isDebug)
+        {
+            for (int y = 0; y < stoneMax - 1; y++)
+            {
+                for (int x = 0; x < stoneMax; x++)
+                {
+                    FallStone(x, _turn, false);
+                }
+            }
+        }
+        else
+        {
+#endif
+            FallStone(3, _turn, false);//左下に黒石を置く
+            FallStone(4, _turn, false);//右下に白石を置く
+            FallStone(4, _turn, false);//右下に白石を置く
+            FallStone(3, _turn, false);//右下に白石を置く
+#if UNITY_EDITOR
+        }
+#endif
+    }
 
     public void FixedUpdate()
     {
@@ -116,16 +141,16 @@ public class FieldGenerator : MonoBehaviour
 
         if (isEndGame)
         { 
-            if (BlackCount + WhiteCount == BoardMax - 1)
+            if (BlackCount + WhiteCount == BoardMax)
             {
-                if (!isFall && !coroutine)
+                //if (!isFall && !coroutine)
                 {
                     StartCoroutine(EndGame());
                 }
             }
         }
     }
-    public void FallStone(int x, StoneState turn)//石を落としたら（マウスクリック）
+    public void FallStone(int x, StoneState turn,bool isTurn)//石を落としたら（マウスクリック）
     {
         if (x < 0 || x > 7) return;
         for (int i = stoneMax-1; i >= 0; i--)
@@ -155,7 +180,10 @@ public class FieldGenerator : MonoBehaviour
                 //}
 
                 //ひっくり返す関数を呼ぶ
-                TurnOver(x, i);
+                if (isTurn)
+                {
+                    TurnOver(x, i);
+                }
 
                 if (turn == StoneState.Black)
                 {
@@ -169,7 +197,7 @@ public class FieldGenerator : MonoBehaviour
                 CountStone();
                 UISet();
 
-                if (BlackCount+WhiteCount == BoardMax-1)
+                if (BlackCount+WhiteCount == BoardMax)
                 {
                     isEndGame = true;
                     //ゲーム終了
@@ -433,6 +461,7 @@ public class FieldGenerator : MonoBehaviour
 
     IEnumerator EndGame()
     {
+        yield return new WaitForSeconds(1);
         CountStone();
 
         StaticData.StaticBlackCount = BlackCount;
@@ -441,10 +470,10 @@ public class FieldGenerator : MonoBehaviour
         EndText.SetActive(true);
         BlackUI.SetActive(false);
         WhiteUI.SetActive(false);
-        StoneParent.SetActive(false);
-        yield return new WaitForSeconds(5);
 
-        SceneManager.LoadScene("ResultScene");
+        yield return new WaitForSeconds(3);
+
+        EndButton.SetActive(true);
     }
     public void UISet()
     {
